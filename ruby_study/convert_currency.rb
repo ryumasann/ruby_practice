@@ -1,5 +1,8 @@
 def convert_currency(amount, source_currency, target_currency, conversion_rates)
+    # Round down
     puts (amount * conversion_rates[:usd] * conversion_rates[:jpy]).floor
+    # Round up
+    # puts (amount * conversion_rates[:usd] * conversion_rates[:jpy]).ceil
 end
 
 conversion_rates = {
