@@ -16,10 +16,7 @@ class VendingMachine
       @cup_inventory -= 1
       @total_amount -= vending_item.price
       print "#{vending_item.name} cup coffee"
-    elsif vending_item.is_a?(Drink)
-      @total_amount -= vending_item.price
-      print vending_item.name
-    elsif vending_item.is_a?(Snack)
+    elsif vending_item.is_a?(Drink) || vending_item.is_a?(Snack)
       @total_amount -= vending_item.price
       print vending_item.name
     end
