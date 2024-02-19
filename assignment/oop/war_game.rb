@@ -7,24 +7,39 @@ PLAYER_NUM = 2
 class Player
   # プレイヤーは手札をもっていて、手札の中からカードを選び捨てて行く
   # 買った場合はカードを取得
-  attr_accessor :cards_in_hand, :cards_you_get
+  attr_accessor :cards_you_get
 
   def initialize
-    @cards_in_hand = []
     @cards_you_get = 0
   end
 
-  def draw(trump_marks, card_size)
-    # trump_mark = trump_marks.sample
-    trump_mark = trump_marks[0]
+  def draw(trump_class)
+    # trump_mark = trump_class.marks.sample
+    trump_mark = trump_class.marks[0]
+    pp trump_class.size
     if trump_mark.cards.length.positive?
-      card_size -= 1
-      pp card_size
+      trump_class.size -= 1
+      pp trump_class.size
       card = trump_mark.cards.pop
     else
-      trump_marks = trump_marks.reject { |trump_mark| trump_mark.cards.empty? }
+      trump_class.marks = trump_class.marks.reject { |trump_mark| trump_mark.cards.empty? }
+      pp trump_class.marks
+      trump_class.marks
     end
   end
+
+  # def draw(trump_marks, trump_size)
+  #   # trump_mark = trump_marks.sample
+  #   trump_mark = trump_marks[0]
+  #   pp trump_size
+  #   if trump_mark.cards.length.positive?
+  #     trump_size -= 1
+  #     pp trump_size
+  #     card = trump_mark.cards.pop
+  #   else
+  #     trump_marks = trump_marks.reject { |trump_mark| trump_mark.cards.empty? }
+  #   end
+  # end
 
   def get_cards(cards)
     @cards_you_get += cards
@@ -32,21 +47,17 @@ class Player
 end
 
 # class GameSetting
+# end
 
 class Trump
   # 親クラスとなり、4種のカードへ継承させる
   CARDS_IN_EACH_MARK = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', 'A'].map(&:to_s)
   ASCENDING_CARDS_STRONGNESS = CARDS_IN_EACH_MARK.clone
-  # CARDS_IN_EACH_MARK = [2, 3, 4, 5, 6, 7, 8, 9, 10, "J", "Q", "K", "A"].map(&:to_s)
 
-  # player_num = 0
-  attr_accessor :cards, :card_size
+  attr_accessor :cards, :size, :marks
 
-  # def initialize(player_num)
   def initialize
-    @card_size = 52
-    # @player_num = player_num
-    @cards = shuffle
+    @cards = shuffle if self.class != Trump
   end
 
   def shuffle
@@ -54,15 +65,20 @@ class Trump
     card_num.shuffle!
   end
 
-  def marks
-    ObjectSpace.each_object(Trump).select { |klass| klass.is_a?(Trump) && (klass.class != (Trump)) }
+  def define_marks
+    @marks = ObjectSpace.each_object(Trump).select { |klass| klass.is_a?(Trump) && (klass.class != (Trump)) }
   end
 
-  def size(trump_marks)
+  def define_size(trump_marks)
     sum = 0
     trump_marks.each { |trump_mark| sum += trump_mark.cards.length }
-    sum
+    @size = sum
   end
+  # def define_size(trump_class)
+  #   sum = 0
+  #   trump_class.marks.each { |trump_mark| sum += trump_mark.cards.length }
+  #   @size = sum
+  # end
 
   def which_strong?
     ASCENDING_CARDS_STRONGNESS
@@ -96,29 +112,37 @@ def war_game
   prayer1 = Player.new
   prayer2 = Player.new
 
-  trump_marks = trump.marks
-  trump_size = trump.size(trump_marks)
+  trump.define_marks
+  trump.define_size(trump.marks)
+  pp trump.size
+  card = ''
 
-  prayer1.draw(trump_marks, trump_size)
-  prayer1.draw(trump_marks, trump_size)
-  prayer1.draw(trump_marks, trump_size)
-  prayer1.draw(trump_marks, trump_size)
-  prayer1.draw(trump_marks, trump_size)
-  prayer1.draw(trump_marks, trump_size)
-  prayer1.draw(trump_marks, trump_size)
-  prayer1.draw(trump_marks, trump_size)
-  prayer1.draw(trump_marks, trump_size)
-  prayer1.draw(trump_marks, trump_size)
-  prayer1.draw(trump_marks, trump_size)
-  prayer1.draw(trump_marks, trump_size)
-  prayer1.draw(trump_marks, trump_size)
-  prayer1.draw(trump_marks, trump_size)
-  prayer1.draw(trump_marks, trump_size)
+  card = prayer1.draw(trump)
+  pp card
+  pp trump.size
+  card = prayer1.draw(trump)
+  pp card
+  pp trump.size
+  prayer1.draw(trump)
+  prayer1.draw(trump)
+  prayer1.draw(trump)
+  prayer1.draw(trump)
+  prayer1.draw(trump)
+  prayer1.draw(trump)
+  prayer1.draw(trump)
+  prayer1.draw(trump)
+  prayer1.draw(trump)
+  prayer1.draw(trump)
+  prayer1.draw(trump)
+  prayer1.draw(trump)
+  prayer1.draw(trump)
+  pp trump.marks
+  pp trump.size
 
-  # while trump.card_size.positive?
+  # while trump.trump_size.positive?
   #   # card_this_turn = [spade, heart, diamond, club].sample
-  #   prayer1.draw(trump_marks, trump.card_size)
-  #   prayer2.draw(trump_marks, trump.card_size)
+  #   prayer1.draw(trump_marks, trump.trump_size)
+  #   prayer2.draw(trump_marks, trump.trump_size)
   #   # if card_this_turn.instance_of(Spade)
   #   # elsif card_this_turn.instance_of(Heart)
   #   #   prayer1.draw(Heart)
