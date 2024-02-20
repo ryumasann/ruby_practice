@@ -8,6 +8,7 @@ class Player
   # プレイヤーは手札をもっていて、手札の中からカードを選び捨てて行く
   # 買った場合はカードを取得
   attr_accessor :cards_you_get
+  attr_reader :draw_card
 
   def initialize
     @cards_you_get = 0
@@ -18,7 +19,7 @@ class Player
     if trump_mark.cards.length.positive?
       trump.size -= 1
       value = trump_mark.cards.pop
-      { trump_mark_name: trump_mark.name, value: value }
+      @draw_card = { trump_mark_name: trump_mark.name, value: value }
     else
       trump.marks = trump.marks.reject { |trump_mark| trump_mark.cards.empty? }
       nil
@@ -35,8 +36,9 @@ end
 
 class Trump
   # 親クラスとなり、4種のカードへ継承させる
-  CARDS_IN_EACH_MARK = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', 'A'].map(&:to_s)
-  ASCENDING_CARDS_STRONGNESS = CARDS_IN_EACH_MARK.clone
+  CARD_VALUES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', 'A'].map(&:to_s)
+  # 強さは昇順
+  CARD_STRONGNESS = CARD_VALUES.clone
 
   attr_accessor :cards, :size, :marks
   attr_reader :name
@@ -46,7 +48,7 @@ class Trump
   end
 
   def shuffle
-    card_num = CARDS_IN_EACH_MARK.clone
+    card_num = CARD_VALUES.clone
     card_num.shuffle!
   end
 
@@ -60,11 +62,24 @@ class Trump
     @size = sum
   end
 
-  def which_strong?(card1, card2)
-    puts "プレイヤー1のカードは#{card1[:trump_mark_name]}の#{card1[:value]}です。"
-    puts "プレイヤー2のカードは#{card2[:trump_mark_name]}の#{card2[:value]}です。"
+  def which_strong?(prayer1, prayer2)
+    puts "プレイヤー1のカードは#{prayer1.draw_card[:trump_mark_name]}の#{prayer1.draw_card[:value]}です。"
+    puts "プレイヤー2のカードは#{prayer2.draw_card[:trump_mark_name]}の#{prayer2.draw_card[:value]}です。"
+    result = ''
+    if CARD_STRONGNESS.index(prayer1.draw_card[:value]) > CARD_STRONGNESS.index(prayer2.draw_card[:value])
+      puts 'プレイヤー1が勝ちました。'
+      result = 'prayer1'
+    elsif CARD_STRONGNESS.index(prayer1.draw_card[:value]) < CARD_STRONGNESS.index(prayer2.draw_card[:value])
+      puts 'プレイヤー2が勝ちました。'
+      result = 'prayer2'
+    elsif CARD_STRONGNESS.index(prayer1.draw_card[:value]) == CARD_STRONGNESS.index(prayer2.draw_card[:value])
+      puts '引き分けです'
+      result = 'draw'
+    else
+      raise
+    end
 
-    # nil unless ASCENDING_CARDS_STRONGNESS.index(card1) > ASCENDING_CARDS_STRONGNESS.index(card2)
+    # nil unless CARD_STRONGNESS.index(card1) > CARD_STRONGNESS.index(card2)
   end
 end
 
@@ -97,7 +112,7 @@ class Club < Trump
 end
 
 def war_start
-  [WAR_START_ANNOUNCEMETS[0], WAR_START_ANNOUNCEMETS[1], EVERY_TURN_NOTICE].join("\n")
+  [WAR_START_ANNOUNCEMETS[0], WAR_START_ANNOUNCEMETS[1]].join("\n")
 end
 
 def war_game
@@ -113,17 +128,31 @@ def war_game
 
   trump.define_marks
   trump.define_size(trump.marks)
-  pp trump.size
   card = ''
 
+  cards_on_table = PLAYER_NUM
   loop do
-    prayer1_card = prayer1.draw(trump)
-    prayer2_card = prayer2.draw(trump)
+    puts EVERY_TURN_NOTICE
+    prayer1.draw(trump)
+    prayer2.draw(trump)
 
-    if prayer1_card && prayer2_card
-      trump.which_strong?(prayer1_card, prayer2_card)
+    if prayer1.draw_card && prayer2.draw_card
+      case trump.which_strong?(prayer1, prayer2)
+      when 'prayer1'
+        prayer1.get_cards(cards_on_table)
+        puts "prayer1:#{prayer1.cards_you_get}"
+        cards_on_table = PLAYER_NUM unless cards_on_table == PLAYER_NUM
+      when 'prayer2'
+        prayer2.get_cards(cards_on_table)
+        puts "prayer2:#{prayer2.cards_you_get}"
+        cards_on_table = PLAYER_NUM unless cards_on_table == PLAYER_NUM
+      when 'draw'
+        cards_on_table += PLAYER_NUM
+        next
+      else
+        raise
+      end
     else
-      puts 'プレイヤー1が勝ちました。'
       puts '戦争を終了します。'
       break
     end
