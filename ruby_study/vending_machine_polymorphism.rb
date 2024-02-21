@@ -12,17 +12,19 @@ class VendingMachine
   def press_button(vending_item)
     return unless @total_amount >= vending_item.price
 
-    if vending_item.is_a?(CupCoffee) && @cup_inventory.positive?
+    if vending_item.instance_of?(CupCoffee) && @cup_inventory.positive?
       @cup_inventory -= 1
       @total_amount -= vending_item.price
       print "#{vending_item.name} cup coffee"
-    elsif vending_item.is_a?(Drink) || vending_item.is_a?(Snack)
+    elsif vending_item.instance_of?(Drink) || vending_item.instance_of?(Snack)
       @total_amount -= vending_item.price
       print vending_item.name
     end
   end
 
   def add_cup(num)
+    return unless num >= MAX_CUPS
+
     @cup_inventory += num
   end
 
