@@ -15,14 +15,22 @@ class Player
   end
 
   def draw(trump)
-    trump_mark = trump.marks.sample
-    if trump_mark.cards.length.positive?
+    loop do
+      if trump.marks.empty?
+        @draw_card = nil
+        break
+      end
+
+      trump_mark = trump.marks.sample
+      if trump_mark.cards.empty?
+        trump.marks = trump.marks.reject { |trump_mark| trump_mark.cards.empty? }
+        next
+      end
+
       trump.size -= 1
       value = trump_mark.cards.pop
       @draw_card = { trump_mark_name: trump_mark.name, value: value }
-    else
-      trump.marks = trump.marks.reject { |trump_mark| trump_mark.cards.empty? }
-      nil
+      break
     end
   end
 
@@ -128,15 +136,13 @@ def war_game
 
   trump.define_marks
   trump.define_size(trump.marks)
-  card = ''
 
   cards_on_table = PLAYER_NUM
   loop do
-    puts EVERY_TURN_NOTICE
     prayer1.draw(trump)
     prayer2.draw(trump)
-
     if prayer1.draw_card && prayer2.draw_card
+      puts EVERY_TURN_NOTICE
       case trump.which_strong?(prayer1, prayer2)
       when 'prayer1'
         prayer1.get_cards(cards_on_table)
