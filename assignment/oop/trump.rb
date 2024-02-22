@@ -18,26 +18,30 @@ class Trump
     card_num.shuffle!
   end
 
+  # def distribute
+  #   @marks = ObjectSpace.each_object(Trump).select { |klass| klass.is_a?(Trump) && (klass.class != (Trump)) }
+  # end
+
   def define_marks
     @marks = ObjectSpace.each_object(Trump).select { |klass| klass.is_a?(Trump) && (klass.class != (Trump)) }
   end
 
-  def define_size(trump_marks)
-    sum = 0
-    trump_marks.each { |trump_mark| sum += trump_mark.cards.length }
-    @size = sum
-  end
+  # def define_size(trump_marks)
+  #   sum = 0
+  #   trump_marks.each { |trump_mark| sum += trump_mark.cards.length }
+  #   @size = sum
+  # end
 
   def which_strong?(prayer1, prayer2)
-    puts "プレイヤー1のカードは#{prayer1.draw_card[:trump_mark_name]}の#{prayer1.draw_card[:value]}です。"
+    puts "#{prayer1.name}のカードは#{prayer1.draw_card[:trump_mark_name]}の#{prayer1.draw_card[:value]}です。"
     puts "プレイヤー2のカードは#{prayer2.draw_card[:trump_mark_name]}の#{prayer2.draw_card[:value]}です。"
     result = ''
     if CARD_STRONGNESS.index(prayer1.draw_card[:value]) > CARD_STRONGNESS.index(prayer2.draw_card[:value])
-      puts 'プレイヤー1が勝ちました。'
-      result = 'prayer1'
+      puts "#{prayer1.name}が勝ちました。"
+      result = prayer1.name
     elsif CARD_STRONGNESS.index(prayer1.draw_card[:value]) < CARD_STRONGNESS.index(prayer2.draw_card[:value])
-      puts 'プレイヤー2が勝ちました。'
-      result = 'prayer2'
+      puts "#{prayer2.name}が勝ちました。"
+      result = prayer2.name
     elsif CARD_STRONGNESS.index(prayer1.draw_card[:value]) == CARD_STRONGNESS.index(prayer2.draw_card[:value])
       puts '引き分けです'
       result = 'draw'
