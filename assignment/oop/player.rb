@@ -3,13 +3,14 @@
 class Player
   # プレイヤーは手札をもっていて、手札の中からカードを選び捨てて行く
   # 買った場合はカードを取得
-  attr_accessor :draw_cards, :distributed_cards
-  attr_reader :draw_card, :name
+  attr_accessor :draw_cards, :distributed_cards, :get_cards
+  attr_reader :name
 
   def initialize(num)
-    @draw_cards = []
+    @draw_cards = nil
     @distributed_cards = []
     @name = "プレイヤー#{num}"
+    @get_cards = []
   end
 
   # def draw(trump)
@@ -32,11 +33,11 @@ class Player
   #   end
   # end
 
-  def get_cards(cards)
-    @draw_cards += cards
-  end
+  # def get_cards(cards)
+  #   @draw_cards += cards
+  # end
 
-  def have_card?
-    @draw_cards += cards
-  end
+  # def have_card?
+  #   @draw_cards += cards
+  # end
 end

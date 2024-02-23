@@ -6,21 +6,36 @@ WAR_START_ANNOUNCEMETS = ['戦争を開始します。', 'カードが配られ�
 EVERY_TURN_NOTICE = '戦争！'
 PLAYER_NUM = 2
 
-# class GameSetting
-#   CARD_VALUES = [2, 3, 4, 5, 6, 7, 8, 9, 10, 'J', 'Q', 'K', 'A'].map(&:to_s)
-#   attr_reader :CARD_VALUES
+def distribute(trump, players)
+  catch :done do
+    loop do
+      players.each do |player|
+        if trump.cards.empty?
+          throw :done
+        else
+          player.distributed_cards.push(trump.cards.pop)
+        end
+      end
+    end
+  end
+end
 
-#   def initialize
-#     @card_values = CARD_VALUES
-#   end
+def who_winner?(card_strongness, displayed_cards)
+  displayed_card_strongness = []
+  # players = []
+  displayed_cards.each_with_index do |displayed_card, _player_num|
+    displayed_card_strongness.push(card_strongness.index(displayed_card[:value]))
+    # players.push(player_num)
+    # displayed_card_strongness.push({ player: player_num, strongness: player_draw_card_strongness })
+    # displayed_card_strongness = player_draw_card_strongness
+  end
+  # strongness_array = displayed_card_strongness.map do |player_draw_card_strongness|
+  #   player_draw_card_strongness[:strongness]
+  # end.flatten
 
-#   def distribute
-#     @card_values = CARD_VALUES
-#   end
-# end
+  return false unless displayed_card_strongness.uniq.length == displayed_card_strongness.length
 
-def distribute
-  @card_values = CARD_VALUES
+  displayed_card_strongness.index(displayed_card_strongness.max)
 end
 
 def war_game
@@ -29,15 +44,34 @@ def war_game
   players = []
   (1..PLAYER_NUM).each { |i| players.push(Player.new(i)) }
 
-  trump.distribute(players)
+  distribute(trump, players)
 
   puts 'カードが配られました。'
-  puts '戦争！'
-  players.each do |player|
-    player.draw_cards.pop
-    puts "#{player.name}のカードは#{player.draw_card[:trump_mark_name]}の#{prayer1.draw_card[:value]}です。"
+  displayed_cards = []
+  loop do
+    battle_cards = []
+    # is_draw = false
+    puts '戦争！'
+
+    players.each do |player|
+      player.draw_cards = player.distributed_cards.pop
+      displayed_cards.push(player.draw_cards)
+      battle_cards.push(player.draw_cards)
+      puts "#{player.name}のカードは#{player.draw_cards[:mark]}の#{player.draw_cards[:value]}です。"
+    end
+
+    winner = who_winner?(trump.card_strongness, battle_cards)
+    if winner
+      puts "#{players[winner].name}が勝ちました。"
+      puts "#{players[winner].name}はカードを#{displayed_cards.size}もらいました" if displayed_cards.length > players.length
+      players[winner].get_cards.push(displayed_cards)
+      displayed_cards = []
+    else
+      puts '引き分けです'
+    end
   end
-  this_turn_player.draw_cards.pop
+
+  # this_turn_player.distributed_cards.pop
 
   # loop do
 
