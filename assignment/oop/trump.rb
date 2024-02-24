@@ -10,15 +10,15 @@ class Trump
   attr_reader :name, :card_strongness
 
   def initialize
-    @cards = shuffle
+    @cards = make_cards
     @size = cards.size
     @card_strongness = CARD_STRONGNESS
   end
 
-  def shuffle
+  def make_cards
     cards = []
-    card_values = CARD_VALUES.clone
-    card_marks = CARD_MARKS.clone
+    card_values = CARD_VALUES
+    card_marks = CARD_MARKS
     card_marks.each_value do |mark|
       card_values.each do |value|
         cards.push({ mark: mark, value: value })
