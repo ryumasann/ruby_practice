@@ -6,24 +6,23 @@ class Trump
   # 強さは昇順
   CARD_STRONGNESS = CARD_VALUES.clone
 
-  attr_accessor :cards, :size, :marks
-  attr_reader :name, :card_strongness
+  attr_accessor :cards
+  attr_reader :card_strongness
 
   def initialize
     @cards = make_cards
-    @size = cards.size
     @card_strongness = CARD_STRONGNESS
   end
 
   def make_cards
-    cards = []
+    card_list = []
     card_values = CARD_VALUES
     card_marks = CARD_MARKS
     card_marks.each_value do |mark|
       card_values.each do |value|
-        cards.push({ mark: mark, value: value })
+        card_list.push({ mark: mark, value: value })
       end
     end
-    cards.shuffle
+    card_list.shuffle
   end
 end
